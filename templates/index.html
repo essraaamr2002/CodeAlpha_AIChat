@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friendly AI Help</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-top: 20px;
+        }
+
+        #chat-container {
+            max-width: 600px;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        #chat-box {
+            height: 300px;
+            overflow-y: scroll;
+            padding: 10px;
+        }
+
+        .message {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 10px;
+            clear: both;
+            overflow-wrap: break-word;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .user-message {
+            background-color: #e5f1ff;
+            float: right;
+            animation: slideInRight 0.5s ease;
+        }
+
+        .bot-message {
+            background-color: #fcefd0;
+            float: left;
+            animation: slideInLeft 0.5s ease;
+        }
+
+        #chat-form {
+            background-color: #f0f0f0;
+            padding: 10px;
+            overflow: hidden;
+            animation: slideInUp 0.5s ease;
+        }
+
+        #user-input {
+            width: calc(100% - 90px);
+            padding: 8px;
+            margin-right: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            float: left;
+            font-size: 16px;
+        }
+
+        #send-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            float: right;
+            transition: background-color 0.3s ease;
+        }
+
+        #send-btn:hover {
+            background-color: #45a049;
+        }
+
+        .loading {
+            text-align: center;
+            color: #aaa;
+            font-style: italic;
+        }
+
+        @keyframes slideInRight {
+            0% {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            0% {
+                opacity: 0;
+                transform: translateX(-100%);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(100%);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Friendly AI Help</h1>
+
+    <div id="chat-container">
+        <div id="chat-box"></div>
+        <form id="chat-form">
+            <input type="text" id="user-input" placeholder="Type your message..." aria-label="Type your message" autocomplete="off">
+            <button type="submit" id="send-btn" aria-label="Send message">Send</button>
+        </form>
+    </div>
+
+    <script>
+        const chatForm = document.getElementById("chat-form");
+        const chatBox = document.getElementById("chat-box");
+        const userInput = document.getElementById("user-input");
+
+        chatForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+            sendMessage();
+        });
+
+        function sendMessage() {
+            const userMessageText = userInput.value.trim();
+            if (!userMessageText) {
+                return;
+            }
+
+            const userMessage = createMessageElement(userMessageText, "user-message");
+            chatBox.appendChild(userMessage);
+            scrollToBottom(chatBox);
+
+            userInput.value = "";
+            userInput.focus();
+
+            showLoadingIndicator();
+
+            fetch("/chat", {
+    method: "POST",
+    body: new URLSearchParams({ 
+        user_input: userMessageText,
+        temperature: 0.7 // Adjust temperature as needed (range: 0 to 1)
+    }),
+    headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": "Bearer YOUR_OPENAI_API_KEY" // Replace YOUR_OPENAI_API_KEY with your actual API key
+    }
+})
+.then(response => response.json())
+.then(data => {
+    removeLoadingIndicator();
+    const botResponse = data.choices[0].text;
+    const botMessageLines = botResponse.split('\n'); // Split the response into lines
+    botMessageLines.forEach(line => {
+        const botMessage = createMessageElement(line.trim(), "bot-message"); // Create a message element for each line
+        chatBox.appendChild(botMessage);
+    });
+    scrollToBottom(chatBox);
+})
+.catch(error => {
+    removeLoadingIndicator();
+    console.error("Error:", error);
+});
+
+        }
+
+        function createMessageElement(text, className) {
+            const messageElement = document.createElement("div");
+            messageElement.className = "message " + className;
+            messageElement.textContent = text;
+            return messageElement;
+        }
+
+        function scrollToBottom(element) {
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function showLoadingIndicator() {
+            const loadingElement = document.createElement("div");
+            loadingElement.className = "loading";
+            loadingElement.textContent = "Sending message...";
+            chatBox.appendChild(loadingElement);
+        }
+
+        function removeLoadingIndicator() {
+            const loadingElement = chatBox.querySelector(".loading");
+            if (loadingElement) {
+                loadingElement.remove();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Chatbot</title>
+    <style>
+        /* Style the chat container */
+        .chat-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            max-width: 500px;
+            background-color: #f9f9f9;
+            z-index: 1;
+        }
+
+        /* Style the background video */
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background video -->
+    <video autoplay muted loop id="bg-video">
+        <source src="{{ url_for('serve_static', filename='1234.mp4') }}" type="video/mp4">
+        Your browser does not support HTML5 video.
+    </video>
+
+    <!-- Chat container -->
+    <div class="chat-container">
+        <div id="chat-display"></div>
+        <input type="text" id="user-input" placeholder="Type your message here...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        // Function to send user message and display bot response
+        function sendMessage() {
+            var userInput = document.getElementById('user-input').value;
+            document.getElementById('chat-display').innerHTML += '<p><strong>You:</strong> ' + userInput + '</p>';
+
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'user_input=' + userInput,
+            })
+            .then(response => response.json())
+            .then(data => {
+                var botResponse = data.response;
+                document.getElementById('chat-display').innerHTML += '<p><strong>Bot:</strong> ' + botResponse + '</p>';
+            })
+            .catch(error => console.error('Error:', error));
+
+            // Clear user input field
+            document.getElementById('user-input').value = '';
+        }
+    </script>
+</body>
+</html>

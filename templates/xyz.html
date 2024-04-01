@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friendly AI Help</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        #video-background {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -1000;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-top: 20px;
+            z-index: 1; /* Ensure header stays on top */
+            position: relative; /* Allow z-index to work */
+        }
+
+        #chat-container {
+            max-width: 600px;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            z-index: 1; /* Ensure chat box stays on top */
+            position: relative; /* Allow z-index to work */
+        }
+
+        /* Your existing CSS styles remain unchanged */
+
+    </style>
+</head>
+<body>
+    <video autoplay muted loop id="video-background">
+        <source src="1234.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <h1>Friendly AI Help</h1>
+
+    <div id="chat-container">
+        <!-- Your existing chat box HTML remains unchanged -->
+    </div>
+
+    <!-- Your existing JavaScript code remains unchanged -->
+
+</body>
+</html>
